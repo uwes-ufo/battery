@@ -1,0 +1,28 @@
+name: ufo
+
+on:
+  push:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+
+  ufo:
+    runs-on: windows-latest
+
+    steps:
+
+    - uses: actions/checkout@v6
+
+    - uses: microsoft/setup-msbuild@v1.0.2
+
+    - run: msbuild /m /p:Configuration=Release
+
+    - uses: actions/upload-artifact@v6
+      with:
+        name: bin-${{ github.sha }}
+        path: x64\Release
+        retention-days: 2
