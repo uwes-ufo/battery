@@ -41,7 +41,7 @@ static BOOL isProcessAlive(const char process_name[]){
 static void w2r(PBATTERY b, LPCSTR sensor, LPCSTR name, double value){
 	char val[256], key[256] = "Software\\HWiNFO64\\Sensors\\Custom\\Battery";
 	HKEY h;
-	sprintf_s(key, "%s: %s %s %s %s %s %s\\%s", key, b->manufacturer, b->fru, b->firmwareversion, b->manufacturedate, b->barcode, b->firstuseddate, sensor);
+	sprintf_s(key, "%s: %s %s %s %s %s %d %s\\%s", key, b->manufacturer, b->fru, b->firmwareversion, b->manufacturedate, b->barcode, b->serialnumber, b->firstuseddate, sensor);
 	sprintf_s(val, "%f", value);
 	if (RegCreateKeyA(HKEY_CURRENT_USER, key, &h)) std::cout << "fail RegCreateKeyA\n";
 	if (RegSetValueExA(h, "Name", 0, REG_SZ, (byte*)name, (DWORD)strlen(name))) std::cout << "fail Name\n";
