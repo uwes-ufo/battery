@@ -211,13 +211,13 @@ static void logger(PBATTERY o, PBATTERY b){
 	if (isnew(o, b)){
 		*o = *b;
 		char logfile[256];
-		sprintf_s(logfile, LOG"battery%d.csv", b->serialnumber);
+		sprintf_s(logfile, LOG"battery.%d.csv", b->serialnumber);
 		writelog(b, isplausible(b) ? logfile : LOG"badbatt.csv");
 	}
 }
 static void batteryinfo(PBATTERY b){
 	char filename[256];
-	sprintf_s(filename, LOG"battery%d.info", b->serialnumber);
+	sprintf_s(filename, LOG"battery.%d.info", b->serialnumber);
 	if (!std::filesystem::exists(filename)){
 		std::ofstream file(filename);
 		file << "chemistry:\t\t" << b->chemistry << "\n";
@@ -231,6 +231,7 @@ static void batteryinfo(PBATTERY b){
 		file << "cycles:\t\t\t" << b->cycles << "\n";
 		file << "capacity.design:\t" << b->capacity.design << " Wh\n";
 		file << "capacity.fullCharge:\t" << b->capacity.fullCharge << " Wh\n";
+		file << "voltage.design:\t" << b->voltage.design << " V\n";
 		file << "current.limit:\t\t" << b->current.limit << " A\n";
 	}
 }
@@ -253,7 +254,7 @@ static void periodlogger(PBATTERY b){
 		next = now + 1;
 //		thresholdstep();
 		char logfile[256];
-		sprintf_s(logfile, LOG"batt%d.csv", b->serialnumber);
+		sprintf_s(logfile, LOG"battery.%d.csv", b->serialnumber);
 		writelog(b, logfile);
 	}
 }
