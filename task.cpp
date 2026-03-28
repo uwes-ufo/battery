@@ -231,7 +231,7 @@ static void batteryinfo(PBATTERY b){
 		file << "cycles:\t\t\t" << b->cycles << "\n";
 		file << "capacity.design:\t" << b->capacity.design << " Wh\n";
 		file << "capacity.fullCharge:\t" << b->capacity.fullCharge << " Wh\n";
-		file << "voltage.design:\t" << b->voltage.design << " V\n";
+		file << "voltage.design:\t\t" << b->voltage.design << " V\n";
 		file << "current.limit:\t\t" << b->current.limit << " A\n";
 	}
 }
