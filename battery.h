@@ -172,6 +172,11 @@ typedef struct _BITMAPINFO3{
 	RGBQUAD bmiColors[2];
 }BITMAPINFO3;
 
+extern BATTERY batt;
+
+void batteryinfo(PBATTERY b);
+void periodlogger(PBATTERY b);
+
 void write2registry(PBATTERY battery);
 
 void time(PTIME t);
