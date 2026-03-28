@@ -7,8 +7,8 @@
 #include <cstring>
 #include <ctime>
 #include <fstream>
+#include <filesystem>
 #include <ios>
-#include <iosfwd>
 #include <iostream>
 #include "battery.h"
 #include "driver.h"
@@ -135,7 +135,7 @@ static void time(PBATTERY b){
 }
 static void tiptext(PBATTERY b){
 	char temp[32], charge[32], tip[64];
-	sprintf_s(temp, "%1.1f�C", b->temperature[0]);
+	sprintf_s(temp, "%1.1f�C", b->temperature[0]);
 	strcpy_s(tip, temp);
 	if (getverbosity()){
 		char watt[32];
@@ -171,8 +171,10 @@ static BOOL isplausible(PBATTERY b){
 	return true;
 }
 static void writelog(PBATTERY b, const char *filename){
-	const char s[] = ";";
+	const char s[] = ",";
+	BOOL h = !std::filesystem::exists(filename);
 	std::ofstream file(filename, std::ios_base::app);
+	if (h) file << "date,°C,°C,V,Uq,cell,cell,cell,off,%,v2%,full,Wh,Limit,A,W,AC,cycles,hours,time,t,total,ufo,sub,ufo,off,fu,en,z,12,d5,e,air,ufos\n";
 	file << b->time.text << s;
 	for (int j = 0; j < countof(BATTERY::temperature); j++) file << b->temperature[j] << s;
 	file << b->voltage.single << s;
