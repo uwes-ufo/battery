@@ -215,6 +215,25 @@ static void logger(PBATTERY o, PBATTERY b){
 		writelog(b, isplausible(b) ? logfile : LOG"badbatt.csv");
 	}
 }
+static void batteryinfo(PBATTERY b){
+	char filename[256];
+	sprintf_s(filename, LOG"battery%d.info", b->serialnumber);
+	if (!std::filesystem::exists(filename)){
+		std::ofstream file(filename);
+		file << "chemistry:\t\t" << b->chemistry << "\n";
+		file << "manufacturer:\t\t" << b->manufacturer << "\n";
+		file << "fru:\t\t\t" << b->fru << "\n";
+		file << "firmwareversion:\t" << b->firmwareversion << "\n";
+		file << "manufacturedate:\t" << b->manufacturedate << "\n";
+		file << "barcode:\t\t" << b->barcode << "\n";
+		file << "serialnumber:\t\t" << b->serialnumber << "\n";
+		file << "firstuseddate:\t\t" << b->firstuseddate << "\n";
+		file << "cycles:\t\t\t" << b->cycles << "\n";
+		file << "capacity.design:\t" << b->capacity.design << " Wh\n";
+		file << "capacity.fullCharge:\t" << b->capacity.fullCharge << " Wh\n";
+		file << "current.limit:\t\t" << b->current.limit << " A\n";
+	}
+}
 static void thresholdstep(void){
 	int u = ibmpmdrv(IBM::GET_UPPER).value, v = u;
 	if (!u) u = 100;
@@ -280,6 +299,7 @@ void battery(void){
 	tiptext(b);
 	statusled(b);
 	write2registry(b);
+	batteryinfo(b);
 //	logger(&logged, b);
 	periodlogger(b);
 }
