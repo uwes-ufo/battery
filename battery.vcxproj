@@ -157,7 +157,9 @@
     <ClCompile Include="battery.cpp" />
     <ClCompile Include="driver.cpp" />
     <ClCompile Include="registry.cpp" />
-    <ClCompile Include="task.cpp" />
+    <ClCompile Include="task.cpp">
+      <DisableLanguageExtensions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</DisableLanguageExtensions>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="battery.rc" />

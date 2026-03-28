@@ -135,7 +135,7 @@ static void time(PBATTERY b){
 }
 static void tiptext(PBATTERY b){
 	char temp[32], charge[32], tip[64];
-	sprintf_s(temp, "%1.1fï¿½C", b->temperature[0]);
+	sprintf_s(temp, "%1.1f°C", b->temperature[0]);
 	strcpy_s(tip, temp);
 	if (getverbosity()){
 		char watt[32];
@@ -174,7 +174,7 @@ static void writelog(PBATTERY b, const char *filename){
 	const char s[] = ",";
 	BOOL h = !std::filesystem::exists(filename);
 	std::ofstream file(filename, std::ios_base::app);
-	if (h) file << "date,Â°C,Â°C,V,Uq,cell,cell,cell,off,%,v2%,full,Wh,Limit,A,W,AC,cycles,hours,time,t,total,ufo,sub,ufo,off,fu,en,z,12,d5,e,air,ufos\n";
+	if (h) file << "date,°C,°C,V,Uq,cell,cell,cell,off,%,v2%,full,Wh,Limit,A,W,AC,cycles,hours,time,t,total,ufo,sub,ufo,off,fu,en,z,12,d5,e,air,ufos\n";
 	file << b->time.text << s;
 	for (int j = 0; j < countof(BATTERY::temperature); j++) file << b->temperature[j] << s;
 	file << b->voltage.single << s;
