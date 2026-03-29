@@ -122,7 +122,8 @@ typedef struct _PRIMARY{
 	WORD chargelevel;
 	WORD remainingcapacity;
 	WORD fullcapacity;
-	short dischargeminutes[2];
+	short dischargeminutes;
+	short lowpassdischargeminutes;
 	short chargeminutes;
 	PRIMARYFLAGS flags;
 	WORD cycles;

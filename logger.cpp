@@ -53,7 +53,7 @@ static void writelog(PBATTERY b, const char* filename){
 	file << b->acAdapter << s;
 	file << b->cycles << s;
 	file << b->operatinghours << s;
-	file << b->duration.value << s;
+	file << b->duration.minutes << s;
 	file << b->duration.driver << s;
 	file << b->capacity.total << s;
 	file << b->ufovoltage << s;
@@ -91,6 +91,8 @@ void batteryinfo(PBATTERY b){
 		file << "serialnumber:           " << b->serialnumber << "\n";
 		file << "firstuseddate:          " << b->firstuseddate << "\n";
 		file << "cycles:                 " << b->cycles << "\n";
+		file << "operatinghours:         " << b->operatinghours << " h\n";
+		file << "total charge:           " << b->capacity.total << " Wh\n";
 		file << "capacity.design:        " << b->capacity.design << " Wh\n";
 		file << "capacity.fullCharge:    " << b->capacity.fullCharge << " Wh\n";
 		file << "voltage.design:         " << b->voltage.design << " V\n";

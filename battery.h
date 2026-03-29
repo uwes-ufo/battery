@@ -116,7 +116,7 @@ typedef struct _CAPACITY{
 }CAPACITY, * PCAPACITY;
 
 typedef struct _DURATION{
-	double value;
+	double minutes;
 	char tip[32];
 	double discharge;
 	double driver;

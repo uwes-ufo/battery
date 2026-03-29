@@ -40,8 +40,8 @@ static void primary(PBATTERY b){
 	cap->remaining = 10e-3 * ti.p.remainingcapacity;
 	cap->fullCharge = 10e-3 * ti.p.fullcapacity;
 	cap->level = cap->remaining / cap->fullCharge;
-	b->duration.discharge = ti.p.dischargeminutes[0] < 0 ? 0 : ti.p.dischargeminutes[0] / 60.0;
-	b->duration.driver = ti.p.chargeminutes >= 0 ? ti.p.chargeminutes : ti.p.dischargeminutes[1] >= 0 ? ti.p.dischargeminutes[1] / 60.0 : 0;
+	b->duration.discharge = ti.p.dischargeminutes < 0 ? 0 : ti.p.dischargeminutes;
+	b->duration.driver = ti.p.chargeminutes >= 0 ? ti.p.chargeminutes : ti.p.lowpassdischargeminutes >= 0 ? ti.p.lowpassdischargeminutes : 0;
 	b->flags.off = ti.p.flags.off;
 	b->flags.full = ti.p.flags.full;
 	b->flags.dischargebelow5 = ti.p.flags.dischargebelow5;
@@ -121,7 +121,7 @@ static void duration(PBATTERY b){
 		case STATE::DISCHARGE: v = (reserve * cap->fullCharge - cap->remaining) / b->power; break;
 		case STATE::CHARGE: v = 60 * (thres * cap->fullCharge - cap->remaining) / b->power; break;
 	}
-	b->duration.value = v;
+	b->duration.minutes = b->state == STATE::DISCHARGE ? 60 * v : v;
 	int minutes = (int)round(60 * abs(v)), hours = minutes / 60; minutes %= 60;
 	sprintf_s(b->duration.tip, "%s%d:%02d", v < 0 ? "-" : "", hours, minutes);
 }
