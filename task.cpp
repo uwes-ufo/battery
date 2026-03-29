@@ -82,6 +82,14 @@ static void firmware(PBATTERY b){
 	b->voltage.endofcharge = 1e-3 / 3.0 * ti.f.endofchargevoltage;
 	for (int j = 0; j < countof(TPPWRIF::f.x0); j++) if (ti.f.x0[j]) ufosight(b, UFOS::F0);
 }
+static int operatinghours(PBATTERY b, int operatinghours){
+	TIME t = { 0 };
+	sscanf_s(b->firstuseddate, "%d-%d-%d", &t.info.tm_year, &t.info.tm_mon, &t.info.tm_mday);
+	t.info.tm_year -= 1900;
+	t.info.tm_mon -= 1;
+	if ((b->time.raw - mktime(&t.info)) / 3600 - operatinghours > 32768) operatinghours += 65536;
+	return operatinghours;
+}
 static void cell(PBATTERY b){
 	TPPWRIF ti = { 0 };
 	tppwrif(&ti, TPI::CELL);
@@ -91,7 +99,7 @@ static void cell(PBATTERY b){
 	if (ti.c.x6c01 != 0x6c01) ufosight(b, UFOS::X6C01);
 	if (ti.c.x0) ufosight(b, UFOS::C0);
 	b->capacity.total = ti.c.totalcharge;
-	b->operatinghours = ti.c.operatinghours;
+	b->operatinghours = operatinghours(b, ti.c.operatinghours);
 	b->ufovoltage = ti.c.ufovoltage;
 	b->ufo121 = ti.c.ufo121;
 	b->ufo61 = ti.c.ufo61;
@@ -175,6 +183,7 @@ void time(PTIME t){
 void battery(void){
 	PBATTERY b = &batt;
 	b->ufos = 0;
+	time(b);
 	primary(b);
 	secondary(b);
 	firmware(b);
@@ -182,7 +191,6 @@ void battery(void){
 	text(b);
 	threshold(b);
 	duration(b);
-	time(b);
 	tiptext(b);
 	statusled(b);
 	write2registry(b);
