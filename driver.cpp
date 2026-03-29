@@ -26,6 +26,5 @@ IBMDW ibmpmdrv(IBM id, BYTE value, IBMRW flag){
 	HANDLE h = CreateFile("\\\\.\\IBMPmDrv");
 	if (!DeviceIoControl(h, USB_CTL((UINT)id), &in, sizeof(in), &out, sizeof(out), &dwOut, NULL)) 
 		std::cout << "mecker: " << GetLastError() << "\n";
-//	std::cout << in.raw << ": " << out.raw << "\n";
 	return out;
 }
