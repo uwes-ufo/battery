@@ -62,8 +62,8 @@ void write2registry(PBATTERY b){
 	w2r(b, "Current0", "Amperage", b->current.lowpass);
 	w2r(b, "Current1", "Amperage Limit", b->current.limit);
 	w2r(b, "Power0", "AC", b->acAdapter);
-	w2r(b, "Power1", "Power", b->power);
-	w2r(b, "Usage0", "Level", 100 * b->capacity.level);
+	w2r(b, "Power1", "Charge Rate", b->power);
+	w2r(b, "Usage0", "Charge Level", 100 * b->capacity.level);
 	w2r(b, "Usage1", "Charge Stop", 100 * b->capacity.threshold);
 	w2r(b, "Usage2", "V2Level", 100 * b->capacity.v2level);
 	w2r(b, "Usage3", "Wear Level", 100 * (1 - b->capacity.fullCharge / b->capacity.design));
