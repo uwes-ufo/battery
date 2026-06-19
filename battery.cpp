@@ -132,7 +132,7 @@ BOOL getverbosity(void){
 }
 void statusled(PBATTERY b){
 	static LED oled;
-	LED led = { COLOR::BLUE, COLOR::BLUE, COLOR::FRAME };
+	LED led = { COLOR::DARKBLUE, COLOR::BLUE, COLOR::FRAME };
 	led.thermo = thermometer(b->temperature[0]);
 	if (b->capacity.level < CAPACITY_LEVEL_WHITE) switch (b->state){
 		case STATE::CHARGE: led.led = b->flags.airplane ? COLOR::PURPLE : COLOR::ORANGE; break;

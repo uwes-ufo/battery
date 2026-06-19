@@ -32,6 +32,7 @@ constexpr struct _TEMPERATURE{
 }TEMP;
 
 typedef enum class _COLOR{
+	DARKBLUE = 0x0000ff,
 	BLUE = 0x0080ff,
 	ORANGE = 0xff8000,
 	RED = 0xff4040,
