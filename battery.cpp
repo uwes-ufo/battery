@@ -54,7 +54,7 @@ static BOOL isframe(PCOLOR color){
 	for (int j = 1; j < 3; j++) if (rgb[0] != rgb[j]) return false;
 	return true;
 }
-static void setled(LED led, LED thermo){
+static void setled(LED led){
 	HDC hdc = GetDC(NULL);
 	HICON hIcon = nid.hIcon;
 	ICONINFO ii;
@@ -69,8 +69,8 @@ static void setled(LED led, LED thermo){
 	if (countof(px) < bm.bmWidth) return;
 	for (int k = 0; k < bm.bmHeight; k++){
 		GetDIBits(hdc, ii.hbmColor, k, 1, px, &b3.bi, DIB_PAL_COLORS);
-		for (int j = 0; j < bm.bmWidth / 2; j++) if ((UINT)px[j]) px[j] = isframe(&px[j]) ? led.frame : led.face;
-		for (int j = bm.bmWidth / 2; j < bm.bmWidth; j++) if ((UINT)px[j]) px[j] = isframe(&px[j]) ? thermo.frame : thermo.face;
+		for (int j = 0; j < bm.bmWidth / 2; j++) if ((UINT)px[j]) px[j] = isframe(&px[j]) ? led.frame : led.led;
+		for (int j = bm.bmWidth / 2; j < bm.bmWidth; j++) if ((UINT)px[j]) px[j] = isframe(&px[j]) ? led.frame : led.thermo;
 		SetDIBits(hdc, ii.hbmColor, k, 1, px, &b3.bi, DIB_PAL_COLORS);
 	}
 	nid.hIcon = CreateIconIndirect(&ii);
@@ -131,19 +131,18 @@ BOOL getverbosity(void){
 	return menuexists(IDM::WATT);
 }
 void statusled(PBATTERY b){
-	static LED oled, othermo;
-	LED led = { COLOR::BLUE, COLOR::FRAME };
-	LED thermo = { COLOR::BLUE, COLOR::FRAME };
-	thermo.face = thermometer(b->temperature[0]);
+	static LED oled;
+	LED led = { COLOR::BLUE, COLOR::BLUE, COLOR::FRAME };
+	led.thermo = thermometer(b->temperature[0]);
 	if (b->capacity.level < CAPACITY_LEVEL_WHITE) switch (b->state){
-		case STATE::CHARGE: led.face = b->flags.airplane ? COLOR::PURPLE : COLOR::ORANGE; break;
+		case STATE::CHARGE: led.led = b->flags.airplane ? COLOR::PURPLE : COLOR::ORANGE; break;
 	}
 	else switch (b->state){
-		case STATE::INACTIVE: led.face = COLOR::GRAY; break;
-		case STATE::CHARGE: led.face = COLOR::WHITE; break;
+		case STATE::INACTIVE: led.led = COLOR::GRAY; break;
+		case STATE::CHARGE: led.led = COLOR::WHITE; break;
 	}
-	if (GetFocus()) { darken(&led.face, 0.8); darken(&led.frame, 0.8); }
-	if (memcmp(&oled, &led, sizeof(LED)) || memcmp(&othermo, &thermo, sizeof(LED))) { setled(led, thermo); oled = led; othermo = thermo; }
+	if (GetFocus()) { darken(&led.led, 0.8); darken(&led.thermo, 0.8); darken(&led.frame, 0.8); }
+	if (memcmp(&oled, &led, sizeof(LED))) { setled(led); oled = led; }
 	menucheck(IDM::TEMPERATURE, b->temperature[0] > TEMP.THROTTLE);
 	menucheck(IDM::LEVEL, b->state == STATE::CHARGE);
 	menucheck(IDM::WATT, b->flags.airplane);

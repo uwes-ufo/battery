@@ -42,7 +42,8 @@ typedef enum class _COLOR{
 }COLOR, * PCOLOR;
 
 typedef struct _LED{
-	COLOR face;
+	COLOR led;
+	COLOR thermo;
 	COLOR frame;
 }LED;
 
