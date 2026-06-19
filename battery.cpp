@@ -22,15 +22,6 @@ CHAR szWindowClass[MAX_LOADSTRING];
 NOTIFYICONDATA nid;
 HMENU hMenu;
 
-static BOOL thermoicon(BOOL b = ACTION::KEEP){
-	static BOOL ti;
-	switch (b){
-		case ACTION::KEEP: break;
-		case ACTION::TOGGLE: ti = !ti; break;
-		default: ti = b; break;
-	}
-	return ti;
-}
 static void darken(PCOLOR color, double brightness){
 	PBYTE rgb = (PBYTE)color;
 	for (int j = 0; j < 3; j++) rgb[j] = min(255, (BYTE)round(rgb[j] * brightness));
@@ -63,7 +54,7 @@ static BOOL isframe(PCOLOR color){
 	for (int j = 1; j < 3; j++) if (rgb[0] != rgb[j]) return false;
 	return true;
 }
-static void setled(LED led){
+static void setled(LED led, LED thermo){
 	HDC hdc = GetDC(NULL);
 	HICON hIcon = nid.hIcon;
 	ICONINFO ii;
@@ -78,7 +69,8 @@ static void setled(LED led){
 	if (countof(px) < bm.bmWidth) return;
 	for (int k = 0; k < bm.bmHeight; k++){
 		GetDIBits(hdc, ii.hbmColor, k, 1, px, &b3.bi, DIB_PAL_COLORS);
-		for (int j = 0; j < bm.bmWidth; j++) if ((UINT)px[j]) px[j] = isframe(&px[j]) ? led.frame : led.face;
+		for (int j = 0; j < bm.bmWidth / 2; j++) if ((UINT)px[j]) px[j] = isframe(&px[j]) ? led.frame : led.face;
+		for (int j = bm.bmWidth / 2; j < bm.bmWidth; j++) if ((UINT)px[j]) px[j] = isframe(&px[j]) ? thermo.frame : thermo.face;
 		SetDIBits(hdc, ii.hbmColor, k, 1, px, &b3.bi, DIB_PAL_COLORS);
 	}
 	nid.hIcon = CreateIconIndirect(&ii);
@@ -139,11 +131,11 @@ BOOL getverbosity(void){
 	return menuexists(IDM::WATT);
 }
 void statusled(PBATTERY b){
-	static LED oled;
-	LED led = { COLOR::BLUE, COLOR::FRAME};
-	if (thermoicon()) led.face = thermometer(b->temperature[0]);
-	else if (b->temperature[0] > TEMP.THROTTLE) led.face = COLOR::RED;
-	else if (b->capacity.level < CAPACITY_LEVEL_WHITE) switch (b->state){
+	static LED oled, othermo;
+	LED led = { COLOR::BLUE, COLOR::FRAME };
+	LED thermo = { COLOR::BLUE, COLOR::FRAME };
+	thermo.face = thermometer(b->temperature[0]);
+	if (b->capacity.level < CAPACITY_LEVEL_WHITE) switch (b->state){
 		case STATE::CHARGE: led.face = b->flags.airplane ? COLOR::PURPLE : COLOR::ORANGE; break;
 	}
 	else switch (b->state){
@@ -151,7 +143,7 @@ void statusled(PBATTERY b){
 		case STATE::CHARGE: led.face = COLOR::WHITE; break;
 	}
 	if (GetFocus()) { darken(&led.face, 0.8); darken(&led.frame, 0.8); }
-	if (memcmp(&oled, &led, sizeof(LED))) { setled(led); oled = led; }
+	if (memcmp(&oled, &led, sizeof(LED)) || memcmp(&othermo, &thermo, sizeof(LED))) { setled(led, thermo); oled = led; othermo = thermo; }
 	menucheck(IDM::TEMPERATURE, b->temperature[0] > TEMP.THROTTLE);
 	menucheck(IDM::LEVEL, b->state == STATE::CHARGE);
 	menucheck(IDM::WATT, b->flags.airplane);
@@ -172,7 +164,6 @@ void setverbosity(BOOL b){
 	if (b == ACTION::TOGGLE) b = !v;
 	else { b = b > 0; if (!b && !menuhilite(IDM::TEMPERATURE) && getfocus()) return; }
 	if (b != v){
-		thermoicon(!b);
 		if (b) { insertitem(IDM::LEVEL); insertitem(IDM::WATT); }
 		else { RemoveMenu(hMenu, (UINT)IDM::LEVEL, false); RemoveMenu(hMenu, (UINT)IDM::WATT, false); }
 	}
@@ -211,7 +202,6 @@ static void rawmouse(HWND hWnd, PRAWINPUT raw){
 static void rawkeyboard(HWND hWnd, PRAWINPUT raw){
 	if (raw->data.keyboard.Message == WM_KEYDOWN){
 		if (getfocus()){
-			if (HIBYTE(GetAsyncKeyState(VK_RSHIFT))) thermoicon(ACTION::TOGGLE);
 			if (HIBYTE(GetAsyncKeyState(VK_RCONTROL))) rawedit(ACTION::TOGGLE);
 		}
 		if (GetFocus()) switch (raw->data.keyboard.VKey){
